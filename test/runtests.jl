@@ -195,7 +195,7 @@ end
     seekstart(stream)
     @test read(stream, UInt8) == UInt8('b')
 end
-	
+
 @testset "BGZF offsets" begin
     function test_virtualoffset(stream, data)
         v = VirtualOffset(stream)
@@ -207,7 +207,7 @@ end
         @test VirtualOffset(stream) == v
         @test read(stream, 128) == next
     end
-    
+
     A = collect(reinterpret(UInt8, rand(1:2000, 100000)))
     buffer = Buffer()
     stream = BGZFCompressorStream(buffer)
@@ -270,6 +270,16 @@ end
     end
     @test eof(reader)
 end
-        
-    
-    
+
+@testset "Threads"
+	filename = joinpath(dirname(@__FILE__), "foo.bgz")
+	arr = [1,2,3,4]
+
+	open(filename, "w") do file
+	io = BGZFCompressorStream(file)
+		write(io, arr)
+		close(io)
+	end
+
+	@test open(x -> read(BGZFDecompressorStream(x)), filename) == arr
+end
