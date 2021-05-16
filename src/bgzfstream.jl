@@ -97,8 +97,9 @@ function TranscodingStreams.process(codec::BGZFCodec{T}, input::Memory, output::
 
         # If we have read in data, but still not enough to queue a block, return no data
         # and wait for more data to be passed
-        wait = !iszero(consumed) & (codec.bufferlen < nfull(Block{T})) 
-        wait && return (consumed, 0, :ok)
+        if !iszero(consumed) && (codec.bufferlen < nfull(Block{T}))
+            return (consumed, 0, :ok)
+        end
 
         # At this point, if there is any data in the buffer, it must be enough
         # to queue a whole block (since the buffer is either full, or input is EOF)
