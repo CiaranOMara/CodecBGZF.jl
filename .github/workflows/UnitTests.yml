@@ -22,6 +22,7 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
+      - run: julia -e 'using Pkg; Pkg.Registry.add(RegistrySpec(url="https://github.com/CiaranOMara/PublicJuliaRegistry.jl"))'
       - name: Run Tests
         uses: julia-actions/julia-runtest@latest
         env:
