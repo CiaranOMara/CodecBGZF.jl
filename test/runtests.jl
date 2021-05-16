@@ -101,7 +101,7 @@ end
 	                     0x05, 0x00, 0x00, 0x00]
 
     stream = BGZFDecompressorStream(IOBuffer(no_bsize))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws BGZFException(CodecBGZFErrors.NO_GZIP_EXTRA_FIELD_BSIZE) read(stream, UInt8)
 
 
 	bad_crc = copy(CodecBGZF.EOF_BLOCK)
@@ -158,7 +158,7 @@ end
 	data = take!(buffer)
 	noend = data[1:end-28]
 	stream = BGZFDecompressorStream(Buffer(noend))
-	@test_throws BGZFError read(stream)
+	@test_throws BGZFException read(stream)
 end
 
 @testset "Larger files" begin
