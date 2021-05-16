@@ -99,11 +99,11 @@ end
 
 "Load `len_minus_one+1` bytes from `buffer` into the block and queue its compression in another thread."
 function load_block!(block::Block{Compressor}, buffer::Vector{UInt8}, len_minus_one::UInt16)
-    block.inlen = len + 1
+    block.inlen = len_minus_one + 1
     # We zero the outlen to mark that it has no data _until_ the queue happens,
     # where the correct outlen is set
     block.outlen = 0
-    unsafe_copyto!(block.indata, 1, buffer, 1, len + 1)
+    unsafe_copyto!(block.indata, 1, buffer, 1, len_minus_one + 1)
     queue!(block)
     return nothing
 end
