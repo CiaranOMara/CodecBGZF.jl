@@ -1,5 +1,5 @@
 # BGZF blocks
-# 
+#
 # Code in this file should not "know about" Codecs, TranscodingStreams,
 # or any of that. It should only rely on Base and LibDeflate, so that means the
 # code in this file can easily be cannibalized for other packages, or repurposed.
@@ -86,7 +86,7 @@ function load_block!(block::Block{Decompressor}, buffer::Vector{UInt8}, len::Uns
     )
 
     bsiz = bsize(block, buffer)
-    bsiz === nothing && error("No GZIP extra field \"BSIZE\"")
+    bsiz === nothing && throw(BGZFError(NO_GZIP_EXTRA_FIELD_BSIZE))
     # By spec, BSIZE is block size -1. Include header_len bytes header, 8 byte tail
     blocksize = bsiz + 1
     block.inlen = blocksize - header_len - 8
@@ -110,7 +110,7 @@ end
 
 "Process the block in another thread"
 queue!(block::Block) = block.task = @spawn _queue!(block)
- 
+
 function _queue!(block::Block{Decompressor})
     unsafe_decompress!(Base.HasLength(), block.de_compressor,
                        pointer(block.outdata), block.outlen,

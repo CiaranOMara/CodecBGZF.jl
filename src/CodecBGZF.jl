@@ -20,6 +20,8 @@ import TranscodingStreams:
 
 import Base.Threads.@spawn
 
+const NO_GZIP_EXTRA_FIELD_BSIZE = "No GZIP extra field \"BSIZE\""
+
 const DE_COMPRESSOR = Union{Compressor, Decompressor}
 
 """
@@ -38,7 +40,7 @@ end
 function bitstore(v::Base.BitInteger, data::Vector{UInt8}, p::Integer)
     unsafe_store!(Ptr{typeof(v)}(pointer(data, p)), htol(v))
 end
-    
+
 @noinline bgzferror(s::String) = throw(BGZFError(s))
 
 include("virtualoffset.jl")

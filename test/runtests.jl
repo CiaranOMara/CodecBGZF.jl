@@ -99,7 +99,7 @@ end
 	                     0x05, 0x00, 0x00, 0x00]
 
     stream = BGZFDecompressorStream(IOBuffer(no_bsize))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws BGZFError(CodecBGZF.NO_GZIP_EXTRA_FIELD_BSIZE) read(stream, UInt8)
 
 
 	bad_crc = copy(CodecBGZF.EOF_BLOCK)
