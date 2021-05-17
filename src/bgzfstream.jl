@@ -77,8 +77,8 @@ end
 # size blocks the codec.
 function TranscodingStreams.process(codec::BGZFCodec{T}, input::Memory, output::Memory, error::Error) where T
     consumed = 0
-    eof = iszero(length(input))
-    
+    is_eof = iszero(length(input))
+
     # We must continue looping through the blocks until we have either consumed
     # or produced data
     while true
@@ -110,7 +110,7 @@ function TranscodingStreams.process(codec::BGZFCodec{T}, input::Memory, output::
 
         # Move to next block where there is either data to return, or space to
         # load more data in (if we have more data to load in)
-        moredata = !(eof & iszero(codec.bufferlen))
+        moredata = !(is_eof & iszero(codec.bufferlen))
         blockindex = next_block!(codec, moredata)
 
         # This happens if there is no block to go to to either load new data or return
