@@ -263,7 +263,9 @@ function Base.seek(s::BGZFDecompressorStream, v::VirtualOffset)
 
     # Read one byte to fill in buffer
     is_eof = eof(s)
-    is_eof || read(s, UInt8)
+    if !is_eof
+        read(s, UInt8)
+    end
 
     # Now advance buffer block_offset minus the one byte we just read
     if byte_offset > get_block(s.codec).outlen
