@@ -117,7 +117,9 @@ function TranscodingStreams.process(codec::BGZFCodec{T}, input::Memory, output::
 
         # This happens if there is no block to go to to either load new data or return
         # existing data. Then we are done.
-        blockindex === nothing && return (0, 0, :end)
+        if blockindex === nothing
+            return (0, 0, :end)
+        end
     end
 end
 
