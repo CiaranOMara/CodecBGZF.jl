@@ -1,6 +1,8 @@
 using CodecBGZF
 using Test
 
+import LibDeflate
+
 # Make a buffer type which we can read from after closing it
 struct Buffer <: IO
     x::Base.GenericIOBuffer{Vector{UInt8}}
@@ -63,23 +65,23 @@ end
 
     # Bad gzip identifier
     stream = BGZFDecompressorStream(IOBuffer([0x1a, 0x1a]))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws LibDeflate.LibDeflateError(LibDeflate.INPUT_DATA_TOO_SHORT) read(stream, UInt8)
 
     # Too short
     stream = BGZFDecompressorStream(IOBuffer([0x1f, 0x8b]))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws LibDeflate.LibDeflateError(LibDeflate.INPUT_DATA_TOO_SHORT) read(stream, UInt8)
 
     # Bad compression flag
     stream = BGZFDecompressorStream(IOBuffer([0x1f, 0x8b, 0x00, 0x04]))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws LibDeflate.LibDeflateError(LibDeflate.INPUT_DATA_TOO_SHORT) read(stream, UInt8)
 
     # Too short
     stream = BGZFDecompressorStream(IOBuffer([0x1f, 0x8b, 0x08, 0x04]))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws LibDeflate.LibDeflateError(LibDeflate.INPUT_DATA_TOO_SHORT) read(stream, UInt8)
 
     # Bad flag
     stream = BGZFDecompressorStream(IOBuffer([0x1f, 0x8b, 0x08, 0xfa]))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws LibDeflate.LibDeflateError(LibDeflate.INPUT_DATA_TOO_SHORT) read(stream, UInt8)
 
 	bad_subfield = UInt8[0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00,
 	                     0x00, 0xff, 0x06, 0x00, 0x42, 0x43, 0x03, 0x00,
@@ -88,7 +90,7 @@ end
 	                     0x05, 0x00, 0x00, 0x00]
 
     stream = BGZFDecompressorStream(IOBuffer(bad_subfield))
-	@test_throws BGZFError read(stream, UInt8)
+	@test_throws LibDeflate.LibDeflateError(LibDeflate.EXTRA_DATA_TOO_LONG) read(stream, UInt8)
 
     no_bsize     = UInt8[0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00,
 	                     0x00, 0xff, 0x06, 0x00, 0x41, 0x43, 0x02, 0x00,
