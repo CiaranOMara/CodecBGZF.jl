@@ -83,7 +83,9 @@ function TranscodingStreams.process(codec::BGZFCodec{T}, input::Memory, output::
     # or produced data
     while true
         # If we have spare data in the current block, just give that
-        is_current_block_empty(codec) || return copy_from_outbuffer(codec, output, consumed)
+        if !is_current_block_empty(codec)
+            return copy_from_outbuffer(codec, output, consumed)
+        end
 
         # If there is data to be read in, we do that.
         if (length(input) - consumed) > 0
