@@ -31,6 +31,15 @@ struct BGZFError <: Exception
     message::String
 end
 
+"""
+    LibDeflateException(message)
+
+LibDeflateException errored with `message` when processing data."
+"""
+struct LibDeflateException <: Exception
+    message
+end
+
 function bitload(T::Type{<:Base.BitInteger}, data::Vector{UInt8}, p::Integer)
     ltoh(unsafe_load(Ptr{T}(pointer(data, p))))
 end

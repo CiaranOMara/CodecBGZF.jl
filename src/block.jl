@@ -79,11 +79,17 @@ end
 in another thread. Return number of bytes consumed"""
 function load_block!(block::Block{Decompressor}, buffer::Vector{UInt8}, len::Unsigned)
     # Parse header
-    header_len, header = LibDeflate.parse_gzip_header(
-        buffer,
+    result = LibDeflate.unsafe_parse_gzip_header(
+        pointer(buffer),
         len % UInt,
         block.gzip_extra_fields
     )
+
+    if result isa LibDeflate.LibDeflateError
+        throw(LibDeflateException(result))
+    end
+
+    header_len, header = result
 
     bsiz = bsize(block, buffer)
     bsiz === nothing && error("No GZIP extra field \"BSIZE\"")
