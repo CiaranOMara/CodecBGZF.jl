@@ -223,7 +223,7 @@ function reset!(s::BGZFDecompressorStream)
     end
     s.codec.index = 1
     s.codec.bufferlen = 0
-    fill!(s.codec.offsets, (0, 0))
+    fill!(s.codec.offsets, VirtualOffset(0, 0))
     return s
 end
 
