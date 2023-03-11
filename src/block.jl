@@ -136,8 +136,15 @@ function _queue!(block::Block{Compressor})
     block.outlen = compress_len + 26
 
     # Header: 18 bytes of header
-    unsafe_copyto!(block.outdata, 1, BLOCK_HEADER, 1, 16)
-    bitstore(UInt16(block.outlen - 1), block.outdata, 17)
+    # unsafe_copyto!(block.outdata, 1, BLOCK_HEADER, 1, 16)
+    # bitstore(UInt16(block.outlen - 1), block.outdata, 17)
+    #TODO: Check copied bytes. Copied and adapted from https://github.com/BioJulia/BGZFStreams.jl/blob/51af9df5ad5bf929c50cff3f45d4a18481fb276f/src/bgzfstream.jl#L498-L505
+    copyto!(block.outdata,
+        # ID1   ID2    CM   FLG  |<--     MTIME    -->|   XFL    OS
+        [0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff])
+    copyto!(block.outdata, 11,
+        #  XLEN    S1    S2    SLEN          BSIZE
+        reinterpret(UInt8, [0x0006, 0x4342, 0x0002, UInt16(block.outlen - 1)]))
 
     # Tail: CRC + isize
     bitstore(block.crc32, block.outdata, 18 + compress_len + 1)
